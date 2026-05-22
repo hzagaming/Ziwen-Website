@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Random Country Lifestyle Challenge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Page Loader -->
+  <div class="page-loader" id="pageLoader">
+    <div class="loader-content">
+      <div class="loader-globe">🌍</div>
+      <div class="loader-text">Loading Experience...</div>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- Cursor Glow -->
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Background Particles -->
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <!-- Mini Particles (for task bursts) -->
+  <canvas class="mini-particles" id="miniParticles" aria-hidden="true"></canvas>
+
+  <!-- Confetti Canvas -->
+  <canvas class="confetti-canvas" id="confettiCanvas" aria-hidden="true"></canvas>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer" role="region" aria-live="polite" aria-label="Notifications"></div>
+
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true">
+    <div class="scroll-progress-fill" id="scrollProgressFill"></div>
+  </div>
+
+  <!-- Top Controls -->
+  <div class="top-controls" role="toolbar" aria-label="Site controls">
+    <button class="control-btn" id="achieveBtn" onclick="toggleAchievements()" title="Achievements" aria-label="Toggle achievements panel">
+      <span id="achieveIcon">🏆</span>
+      <span class="badge-dot hidden" id="achieveDot"></span>
+    </button>
+    <button class="control-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Dark/Light Mode" aria-label="Toggle dark light mode">
+      <span id="themeIcon">🌙</span>
+    </button>
+    <button class="control-btn" id="soundBtn" onclick="toggleSound()" title="Toggle Sound Effects" aria-label="Toggle sound effects">
+      <span id="soundIcon">🔇</span>
+    </button>
+    <button class="control-btn" id="bgmBtn" onclick="toggleBGM()" title="Toggle Background Music" aria-label="Toggle background music">
+      <span id="bgmIcon">🎵</span>
+      <span class="bgm-status" id="bgmStatus">OFF</span>
+    </button>
+    <button class="control-btn" id="settingsBtn" onclick="toggleSettings()" title="Settings" aria-label="Toggle settings panel">
+      <span>⚙️</span>
+    </button>
+  </div>
+
+  <!-- Settings Panel -->
+  <div class="settings-panel hidden" id="settingsPanel" role="dialog" aria-label="Settings" aria-modal="false">
+    <div class="settings-header">
+      <h3>Settings</h3>
+      <button class="close-btn" onclick="toggleSettings()" aria-label="Close settings">&times;</button>
+    </div>
+    <div class="settings-body">
+      <div class="setting-row">
+        <label for="sfxVolume">Sound Effects Volume</label>
+        <input type="range" id="sfxVolume" min="0" max="100" value="50" oninput="updateSfxVolume(this.value)">
+        <span class="volume-value" id="sfxVolumeValue">50%</span>
+      </div>
+      <div class="setting-row">
+        <label for="bgmVolume">Music Volume</label>
+        <input type="range" id="bgmVolume" min="0" max="100" value="30" oninput="updateBgmVolume(this.value)">
+        <span class="volume-value" id="bgmVolumeValue">30%</span>
+      </div>
+      <div class="setting-row">
+        <label>Reduced Motion</label>
+        <button class="toggle-switch" id="reducedMotionToggle" onclick="toggleReducedMotion()" aria-pressed="false">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievements Panel -->
+  <div class="achievements-panel hidden" id="achievementsPanel" role="dialog" aria-label="Achievements" aria-modal="false">
+    <div class="achievements-header">
+      <h3>🏆 Achievements</h3>
+      <button class="close-btn" onclick="toggleAchievements()" aria-label="Close achievements">&times;</button>
+    </div>
+    <div class="achievements-body" id="achievementsBody"></div>
+  </div>
+
+  <!-- Certificate Modal -->
+  <div class="modal-overlay hidden" id="certModal" role="dialog" aria-label="Completion Certificate" aria-modal="true">
+    <div class="modal-content certificate-modal">
+      <button class="modal-close" onclick="closeCertificate()" aria-label="Close certificate">&times;</button>
+      <div class="certificate" id="certificateContent">
+        <div class="cert-border">
+          <div class="cert-inner">
+            <div class="cert-header">🌍 Certificate of Cultural Exploration</div>
+            <div class="cert-sub">Random Country Lifestyle Challenge</div>
+            <div class="cert-divider">━━━━━━ ✦ ━━━━━━</div>
+            <div class="cert-body">
+              <p>This certifies that</p>
+              <input type="text" class="cert-name" id="certName" placeholder="Your Name" value="">
+              <p>has successfully completed the one-day lifestyle challenge for</p>
+              <div class="cert-country">
+                <span class="cert-flag" id="certFlag">🇨🇳</span>
+                <span class="cert-country-name" id="certCountryName">China</span>
+              </div>
+              <p class="cert-date" id="certDate">Date</p>
+            </div>
+            <div class="cert-seal">✦</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="action-btn" onclick="downloadCertificate()">
+          <span class="btn-icon">💾</span> Save as Image
+        </button>
+        <button class="action-btn secondary" onclick="closeCertificate()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Tooltip -->
+  <div class="onboarding hidden" id="onboarding">
+    <div class="onboarding-content">
+      <div class="onboarding-emoji">👋</div>
+      <h3>Welcome!</h3>
+      <p>Press <strong>Space</strong> or click <strong>Random Draw</strong> to start your cultural journey.</p>
+      <button class="action-btn" onclick="dismissOnboarding()">Got it!</button>
+    </div>
+  </div>
+
+  <div class="container" id="main-content">
+    <header>
+      <div class="header-badge" aria-label="Project context">🌍 Identities & Relationships</div>
+      <h1>Random Country Lifestyle Challenge</h1>
+      <p class="subtitle">Experience how culture shapes identity and relationships</p>
+      <div class="header-decoration" aria-hidden="true"></div>
+    </header>
+
+    <section class="intro" id="intro">
+      <h2>About This Challenge</h2>
+      <p>
+        Randomly draw a country and follow that country’s daily lifestyle routine. 
+        Through this experience, you can understand how culture influences people’s 
+        identity, values, behaviour and relationships.
+      </p>
+      <div class="context-box">
+        <div class="context-row">
+          <span class="context-label">Global Context</span>
+          <span class="context-value">Identities and Relationships</span>
+        </div>
+        <div class="context-row research-row">
+          <span class="context-label">Research Question</span>
+          <span class="context-value research-value" id="typewriterText"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works" id="howItWorks">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step" data-step="1">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h4>Draw a Country</h4>
+            <p>Click the Random Draw button to randomly select a country.</p>
+          </div>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h4>Read & Learn</h4>
+            <p>Explore the cultural background, focus and identity link.</p>
+          </div>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h4>Follow for One Day</h4>
+            <p>Try each daily routine task and tick them off as you go.</p>
+          </div>
+        </div>
+        <div class="step" data-step="4">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h4>Reflect</h4>
+            <p>Answer the reflection question to think about your experience.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="draw-section" id="drawSection">
+      <h2>Ready to Start?</h2>
+      <p class="draw-instruction">Click the button below to randomly draw a country and begin your one-day cultural lifestyle challenge!</p>
+      
+      <div class="selector-area" id="selectorArea" aria-live="polite" aria-atomic="true">
+        <div class="flag-display" id="flagDisplay">🌍</div>
+        <div class="country-name-display" id="countryNameDisplay">Random Country</div>
+        <div class="spinner-ring" id="spinnerRing" aria-hidden="true"></div>
+        <div class="spinner-glow" aria-hidden="true"></div>
+      </div>
+
+      <button class="draw-btn pulse" id="drawBtn" onclick="drawCountry()">
+        <span class="btn-icon">🎲</span>
+        <span class="btn-text">Random Draw</span>
+      </button>
+      <button class="draw-btn hidden" id="drawAgainBtn" onclick="drawCountry()">
+        <span class="btn-icon">🔄</span>
+        <span class="btn-text">Draw Again</span>
+      </button>
+
+      <div class="history-area hidden" id="historyArea">
+        <h4>Your Journey</h4>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </section>
+
+    <section class="result-section hidden" id="resultSection">
+      <div class="country-card">
+        <div class="flag-glow">
+          <div class="flag" id="resultFlag">🇨🇳</div>
+        </div>
+        <h2 id="resultCountryName">China</h2>
+        <div class="country-info">
+          <div class="info-block">
+            <h3><span class="info-icon">📖</span>Cultural Background</h3>
+            <p id="resultBackground">...</p>
+          </div>
+          <div class="info-block">
+            <h3><span class="info-icon">🎯</span>Main Cultural Focus</h3>
+            <p id="resultFocus">...</p>
+          </div>
+          <div class="info-block highlight">
+            <h3><span class="info-icon">💡</span>Identity and Relationship Link</h3>
+            <p id="resultIdentity">...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="challenge-section hidden" id="challengeSection">
+      <div class="challenge-header">
+        <h2>Daily Routine Challenge</h2>
+        <p class="challenge-intro">Follow this country’s lifestyle for one day and reflect on how culture affects behaviour, identity and relationships.</p>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Task completion progress">
+          <div class="progress-fill" id="progressFill"></div>
+          <div class="progress-shine" aria-hidden="true"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 0 tasks completed</div>
+      </div>
+
+      <div class="tasks-container" id="tasksContainer"></div>
+
+      <div class="celebration hidden" id="celebration" role="status" aria-live="polite">
+        <div class="celebration-emoji">🎉</div>
+        <h3>Challenge Complete!</h3>
+        <p>You have completed all tasks for today. Great job experiencing a new cultural lifestyle!</p>
+        <button class="action-btn" onclick="showCertificate()" style="margin-top:16px">
+          <span class="btn-icon">📜</span> View Certificate
+        </button>
+      </div>
+
+      <div class="challenge-actions">
+        <button class="action-btn secondary" id="resetBtn" onclick="resetProgress()">
+          <span class="btn-icon">↩️</span> Reset Progress
+        </button>
+        <button class="action-btn secondary" id="printBtn" onclick="printChallenge()">
+          <span class="btn-icon">🖨️</span> Print
+        </button>
+        <button class="action-btn secondary" id="copyBtn" onclick="copyChallenge()">
+          <span class="btn-icon">📋</span> Copy Text
+        </button>
+      </div>
+
+      <div class="sensitivity-note">
+        <div class="note-icon">⚠️</div>
+        <p><strong>Cultural Sensitivity Note:</strong> Cultural habits vary widely within every country. The tasks above describe practices that <em>may</em> be common in some contexts, but not everyone follows the same lifestyle. This challenge is designed to encourage respectful curiosity and reflection, not to stereotype.</p>
+      </div>
+    </section>
+
+    <section class="reflection-section hidden" id="reflectionSection">
+      <h2>Reflection</h2>
+      <div class="reflection-card">
+        <div class="reflection-icon">🤔</div>
+        <p class="reflection-question">
+          After following this lifestyle, which habit felt most different from your 
+          normal life? How did it change your behaviour or interaction with others?
+        </p>
+        <textarea 
+          id="reflectionText" 
+          placeholder="Type your reflection here..."
+          rows="6"
+          aria-label="Reflection answer"
+        ></textarea>
+        <div class="reflection-actions">
+          <button class="action-btn secondary" onclick="copyReflection()">
+            <span class="btn-icon">📋</span> Copy Reflection
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>Random Country Lifestyle Challenge — A School Project on Identities and Relationships</p>
+      <p class="footer-hint">Press <kbd>Space</kbd> to draw • <kbd>R</kbd> to reset • <kbd>P</kbd> to print • <kbd>M</kbd> music • <kbd>S</kbd> sound • <kbd>T</kbd> theme</p>
+    </footer>
+  </div>
+
+  <button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="Back to top" aria-label="Back to top">
+    <span>↑</span>
+  </button>
+
+  <script src="script.js"></script>
+</body>
+</html>
