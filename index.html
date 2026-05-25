@@ -41,7 +41,7 @@
 
   <!-- Top Controls -->
   <div class="top-controls" role="toolbar" aria-label="Site controls">
-    <button class="control-btn" id="achieveBtn" onclick="toggleAchievements()" title="Achievements" aria-label="Toggle achievements panel">
+    <button class="control-btn" id="achieveBtn" onclick="toggleAchievements()" title="Achievements" aria-label="Toggle achievements panel" aria-expanded="false" aria-controls="achievementsPanel">
       <span id="achieveIcon">🏆</span>
       <span class="badge-dot hidden" id="achieveDot"></span>
     </button>
@@ -55,7 +55,7 @@
       <span id="bgmIcon">🎵</span>
       <span class="bgm-status" id="bgmStatus">OFF</span>
     </button>
-    <button class="control-btn" id="settingsBtn" onclick="toggleSettings()" title="Settings" aria-label="Toggle settings panel">
+    <button class="control-btn" id="settingsBtn" onclick="toggleSettings()" title="Settings" aria-label="Toggle settings panel" aria-expanded="false" aria-controls="settingsPanel">
       <span>⚙️</span>
     </button>
   </div>
@@ -78,8 +78,8 @@
         <span class="volume-value" id="bgmVolumeValue">30%</span>
       </div>
       <div class="setting-row">
-        <label>Reduced Motion</label>
-        <button class="toggle-switch" id="reducedMotionToggle" onclick="toggleReducedMotion()" aria-pressed="false">
+        <label for="reducedMotionToggle">Reduced Motion</label>
+        <button class="toggle-switch" id="reducedMotionToggle" onclick="toggleReducedMotion()" aria-pressed="false" type="button">
           <span class="toggle-knob"></span>
         </button>
       </div>
@@ -107,7 +107,7 @@
             <div class="cert-divider">━━━━━━ ✦ ━━━━━━</div>
             <div class="cert-body">
               <p>This certifies that</p>
-              <input type="text" class="cert-name" id="certName" placeholder="Your Name" value="">
+              <input type="text" class="cert-name" id="certName" placeholder="Your Name" value="" aria-label="Your name for the certificate">
               <p>has successfully completed the one-day lifestyle challenge for</p>
               <div class="cert-country">
                 <span class="cert-flag" id="certFlag">🇨🇳</span>
@@ -138,7 +138,7 @@
     </div>
   </div>
 
-  <div class="container" id="main-content">
+  <main class="container" id="main-content">
     <header>
       <div class="header-badge" aria-label="Project context">🌍 Identities & Relationships</div>
       <h1>Random Country Lifestyle Challenge</h1>
@@ -171,28 +171,28 @@
         <div class="step" data-step="1">
           <div class="step-number">1</div>
           <div class="step-content">
-            <h4>Draw a Country</h4>
+            <h3>Draw a Country</h3>
             <p>Click the Random Draw button to randomly select a country.</p>
           </div>
         </div>
         <div class="step" data-step="2">
           <div class="step-number">2</div>
           <div class="step-content">
-            <h4>Read & Learn</h4>
+            <h3>Read & Learn</h3>
             <p>Explore the cultural background, focus and identity link.</p>
           </div>
         </div>
         <div class="step" data-step="3">
           <div class="step-number">3</div>
           <div class="step-content">
-            <h4>Follow for One Day</h4>
+            <h3>Follow for One Day</h3>
             <p>Try each daily routine task and tick them off as you go.</p>
           </div>
         </div>
         <div class="step" data-step="4">
           <div class="step-number">4</div>
           <div class="step-content">
-            <h4>Reflect</h4>
+            <h3>Reflect</h3>
             <p>Answer the reflection question to think about your experience.</p>
           </div>
         </div>
@@ -317,7 +317,7 @@
       <p>Random Country Lifestyle Challenge — A School Project on Identities and Relationships</p>
       <p class="footer-hint">Press <kbd>Space</kbd> to draw • <kbd>R</kbd> to reset • <kbd>P</kbd> to print • <kbd>M</kbd> music • <kbd>S</kbd> sound • <kbd>T</kbd> theme</p>
     </footer>
-  </div>
+  </main>
 
   <button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="Back to top" aria-label="Back to top">
     <span>↑</span>
