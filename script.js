@@ -1420,6 +1420,7 @@ function toggleReducedMotion() {
   sfxClick();
   reducedMotion = !reducedMotion;
   document.body.classList.toggle('reduced-motion', reducedMotion);
+  document.documentElement.classList.toggle('reduced-motion', reducedMotion);
   document.getElementById('reducedMotionToggle').setAttribute('aria-pressed', reducedMotion);
   try { localStorage.setItem('reducedMotion', reducedMotion); } catch(e) {}
   showToast(reducedMotion ? 'Reduced motion enabled' : 'Reduced motion disabled', 'success');
@@ -1609,6 +1610,7 @@ function initCardTilt() {
   observer.observe(document.body, { childList: true, subtree: true });
 
   document.addEventListener('mousemove', (e) => {
+    if (reducedMotion) return;
     tiltElements.forEach(card => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -1780,7 +1782,7 @@ function downloadCertificate() {
    ================================================================ */
 
 function dismissOnboarding() {
-  sfxClick();
+  if (!onboarding.classList.contains('hidden')) sfxClick();
   onboarding.classList.add('hidden');
   try { localStorage.setItem('onboardingSeen', 'true'); } catch(e) {}
 }
@@ -2093,9 +2095,13 @@ function loadState() {
 
     document.title = `${country.flag} ${country.name} — Lifestyle Challenge`;
     isRestoringState = true;
-    updateProgress();
-    isRestoringState = false;
+    try {
+      updateProgress();
+    } finally {
+      isRestoringState = false;
+    }
     showToast('Restored your previous challenge!', 'success');
+    dismissOnboarding();
   } catch (e) {
     localStorage.removeItem('challengeState');
   }
@@ -2164,6 +2170,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (savedReduced === 'true') {
     reducedMotion = true;
     document.body.classList.add('reduced-motion');
+    document.documentElement.classList.add('reduced-motion');
     document.getElementById('reducedMotionToggle').setAttribute('aria-pressed', 'true');
   }
 
