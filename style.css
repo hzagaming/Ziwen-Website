@@ -852,7 +852,7 @@ section.visible .step {
   box-shadow: 0 4px 14px var(--glow);
 }
 
-.step-content h4 { font-size: 1.05rem; color: var(--text); margin-bottom: 5px; font-weight: 700; }
+.step-content h3 { font-size: 1.05rem; color: var(--text); margin-bottom: 5px; font-weight: 700; }
 .step-content p { font-size: 0.9rem; color: var(--text-light); line-height: 1.5; }
 
 /* ===== Draw Section ===== */

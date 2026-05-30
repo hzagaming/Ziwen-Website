@@ -964,6 +964,8 @@ let reducedMotion = false;
 let bgmSequenceIndex = 0;
 let hasReset = false;
 let isDrawing = false;
+let isRestoringState = false;
+let miniAnimationId = null;
 
 /* ========== DOM Elements ========== */
 const pageLoader = document.getElementById('pageLoader');
@@ -1282,36 +1284,42 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, alpha) {
 }
 
 function drawMiniParticles() {
-  miniCtx.clearRect(0, 0, miniParticlesCanvas.width, miniParticlesCanvas.height);
-  for (let i = miniParticles.length - 1; i >= 0; i--) {
-    const p = miniParticles[i];
-    p.x += p.vx;
-    p.y += p.vy;
-    p.vy += 0.10;
-    p.vx *= 0.98;
-    p.life -= p.decay;
+  if (miniAnimationId) return;
+  function loop() {
+    miniCtx.clearRect(0, 0, miniParticlesCanvas.width, miniParticlesCanvas.height);
+    for (let i = miniParticles.length - 1; i >= 0; i--) {
+      const p = miniParticles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.10;
+      p.vx *= 0.98;
+      p.life -= p.decay;
 
-    if (p.life <= 0) {
-      miniParticles.splice(i, 1);
-      continue;
+      if (p.life <= 0) {
+        miniParticles.splice(i, 1);
+        continue;
+      }
+
+      miniCtx.globalAlpha = p.life;
+      miniCtx.fillStyle = p.color;
+      const s = p.size * p.life;
+      if (p.shape === 'star') {
+        drawStar(miniCtx, p.x, p.y, 5, s * 1.4, s * 0.6, p.life);
+      } else {
+        miniCtx.beginPath();
+        miniCtx.arc(p.x, p.y, s, 0, Math.PI * 2);
+        miniCtx.fill();
+      }
     }
+    miniCtx.globalAlpha = 1;
 
-    miniCtx.globalAlpha = p.life;
-    miniCtx.fillStyle = p.color;
-    const s = p.size * p.life;
-    if (p.shape === 'star') {
-      drawStar(miniCtx, p.x, p.y, 5, s * 1.4, s * 0.6, p.life);
+    if (miniParticles.length > 0) {
+      miniAnimationId = requestAnimationFrame(loop);
     } else {
-      miniCtx.beginPath();
-      miniCtx.arc(p.x, p.y, s, 0, Math.PI * 2);
-      miniCtx.fill();
+      miniAnimationId = null;
     }
   }
-  miniCtx.globalAlpha = 1;
-
-  if (miniParticles.length > 0) {
-    requestAnimationFrame(drawMiniParticles);
-  }
+  miniAnimationId = requestAnimationFrame(loop);
 }
 
 /* ================================================================
@@ -1993,10 +2001,12 @@ function updateProgress() {
 
   if (completed === total && total > 0) {
     celebration.classList.remove('hidden');
-    celebration.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    launchConfetti();
-    sfxCelebrate();
-    showToast('🎉 All tasks completed! Amazing work!', 'success');
+    if (!isRestoringState) {
+      celebration.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      launchConfetti();
+      sfxCelebrate();
+      showToast('🎉 All tasks completed! Amazing work!', 'success');
+    }
     unlockAchievement('task_master');
     if (!hasReset) unlockAchievement('perfect_day');
   } else {
@@ -2082,7 +2092,9 @@ function loadState() {
     drawBtn.classList.add('hidden');
 
     document.title = `${country.flag} ${country.name} — Lifestyle Challenge`;
+    isRestoringState = true;
     updateProgress();
+    isRestoringState = false;
     showToast('Restored your previous challenge!', 'success');
   } catch (e) {
     localStorage.removeItem('challengeState');
@@ -2130,15 +2142,21 @@ window.addEventListener('DOMContentLoaded', () => {
   // Load volume settings
   const savedSfxVol = localStorage.getItem('sfxVolume');
   if (savedSfxVol !== null) {
-    sfxVolume = savedSfxVol / 100;
-    document.getElementById('sfxVolume').value = savedSfxVol;
-    document.getElementById('sfxVolumeValue').textContent = savedSfxVol + '%';
+    const sv = parseFloat(savedSfxVol);
+    if (!isNaN(sv)) {
+      sfxVolume = sv / 100;
+      document.getElementById('sfxVolume').value = sv;
+      document.getElementById('sfxVolumeValue').textContent = sv + '%';
+    }
   }
   const savedBgmVol = localStorage.getItem('bgmVolume');
   if (savedBgmVol !== null) {
-    bgmVolume = savedBgmVol / 100;
-    document.getElementById('bgmVolume').value = savedBgmVol;
-    document.getElementById('bgmVolumeValue').textContent = savedBgmVol + '%';
+    const bv = parseFloat(savedBgmVol);
+    if (!isNaN(bv)) {
+      bgmVolume = bv / 100;
+      document.getElementById('bgmVolume').value = bv;
+      document.getElementById('bgmVolumeValue').textContent = bv + '%';
+    }
   }
 
   // Load reduced motion
@@ -2158,5 +2176,5 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(checkOnboarding, 2500);
 
   // Restore previous challenge
-  setTimeout(loadState, 500);
+  setTimeout(loadState, 2000);
 });
