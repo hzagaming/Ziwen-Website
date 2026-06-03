@@ -2140,7 +2140,7 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('scroll', handleScroll);
 
   // Typewriter effect for research question
-  const rqText = 'How do different countries\' daily routines, cultural habits and social behaviours shape people\'s identity and influence the way they interact with others?';
+  const rqText = 'To what extent can an interactive culture-experience website help teenagers critically understand how cultural, religious, and daily lifestyle backgrounds shape and influence individual identity, personal values, and relationships within modern society?';
   setTimeout(() => {
     typeWriter(document.getElementById('typewriterText'), rqText, 30);
   }, 2000);
